@@ -15,7 +15,9 @@ entity main is
       -- Input ports
     Clk : in std_logic;
     operacaoULA: in std_logic_vector(2 downto 0);
-    escritaC: in std_logic
+    escritaC: in std_logic;
+	 ULAout: out std_logic_vector(DATA_WIDTH-1 downto 0);
+	 PCout: out std_logic_vector(ADDR_WIDTH-1 downto 0)
 );
 end entity;
 
@@ -67,5 +69,7 @@ begin
                saida => saidaULA
                -- flagZero => flagZero
              ); 
-
+  ULAout <= saidaULA;
+  PCout <= saidaPC;
+  
 end architecture;
