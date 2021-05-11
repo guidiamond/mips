@@ -9,7 +9,7 @@ use ieee.numeric_std.all;
 entity unidadeControle is
   generic (
               OPCODE_WIDTH: natural := 6;
-              PALAVRA_CONTROLE_WIDTH: natural := 5
+              PALAVRA_CONTROLE_WIDTH: natural := 6
   );
   port   (
     -- Input ports
@@ -28,6 +28,7 @@ architecture arch_name of unidadeControle is
   alias habEscritaReg : std_logic is pontosControle(0);
   alias selOperacaoULA : std_logic_vector(2 downto 0) is pontosControle(3 downto 1);
   alias habEscritRam : std_logic is pontosControle(4);
+  alias habLeituraRam : std_logic is pontosControle(5);
 
   -- INSTRUCTIONS
   constant lw : std_logic_vector := "100011";
@@ -41,6 +42,8 @@ architecture arch_name of unidadeControle is
                    "000";
 
     habEscritRam <= '1' when opCode = sw else '0';
+
+    habLeituraRam <= '1' when opCode = lw else '0';
 
 
     -- Assign resultado final para output

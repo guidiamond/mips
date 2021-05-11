@@ -37,25 +37,9 @@ function initMemory
   begin
         -- Inicializa os endereços:
         tmp(0) := x"000AAAAA";
-        tmp(1) := x"000000FF";
-        tmp(2) := x"000000FE";
-        tmp(3) := x"0000002D";
-        tmp(4) := x"0000003D";
-        tmp(5) := x"0000004D";
-        tmp(6) := x"0000005D";
-        tmp(7) := x"0000006D";
-        tmp(8) := x"0000007D";
-        tmp(9) := x"0000008D";
-        tmp(10) := x"0000009D";
-        tmp(11) := x"000000AD";
-        tmp(12) := x"000000BD";
-        tmp(13) := x"000000CD";
-        tmp(14) := x"000000DD";
-        tmp(15) := x"000000ED";
-        tmp(16) := x"000001FD";
-        tmp(17) := x"000002FD";
-        tmp(18) := x"000000FD";
-        tmp(19) := x"000004FD";
+        tmp(8) := x"00000001"; -- t0
+        tmp(9) := x"00000002"; -- t1
+        tmp(29) := x"00000004"; -- sp
         return tmp;
     end initMemory;
 

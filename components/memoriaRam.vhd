@@ -11,7 +11,9 @@ entity memoriaRam IS
           Endereco : IN  STD_LOGIC_VECTOR (addrWidth-1 DOWNTO 0);
           Dado_in  : in std_logic_vector(dataWidth-1 downto 0);
           Dado_out : out std_logic_vector(dataWidth-1 downto 0);
-          we : in std_logic := '0'
+          we       : in std_logic := '1';
+          re       : in std_logic := '1'
+			 
         );
 end entity;
 
@@ -20,9 +22,9 @@ architecture assincrona OF memoriaRam IS
 
   signal memRAM: blocoMemoria;
 --  Caso queira inicializar a RAM (para testes):
---  attribute ram_init_file : string;
---  attribute ram_init_file of memRAM:
---  signal is "RAMcontent.mif";
+  attribute ram_init_file : string;
+  attribute ram_init_file of memRAM:
+  signal is "components/RAM.mif";
 
 -- Utiliza uma quantidade menor de endereços locais:
    signal EnderecoLocal : std_logic_vector(memoryAddrWidth-1 downto 0);
@@ -42,6 +44,7 @@ begin
   end process;
 
   -- A leitura deve ser sempre assincrona:
-  Dado_out <= memRAM(to_integer(unsigned(EnderecoLocal)));
+  Dado_out <= memRAM(to_integer(unsigned(EnderecoLocal))) when re = '1' else (others => 'Z');
 
 end architecture;
+

@@ -7,7 +7,7 @@ entity main is
             DATA_WIDTH : NATURAL := 32;
             ADDR_WIDTH : NATURAL := 32;
             CONSTANTE_PC: NATURAL := 4;
-            PALAVRA_CONTROLE_WIDTH: NATURAL := 5;
+            PALAVRA_CONTROLE_WIDTH: NATURAL := 6;
             REG_WIDTH: NATURAL := 5
           );
 
@@ -15,16 +15,13 @@ entity main is
   (
       -- Input ports
     Clk : in std_logic;
-    operacaoULA: in std_logic_vector(2 downto 0);
-    escritaC: in std_logic;
-	 ULAout: out std_logic_vector(DATA_WIDTH-1 downto 0);
-	 PCout: out std_logic_vector(ADDR_WIDTH-1 downto 0)
+	  ULAout: out std_logic_vector(DATA_WIDTH-1 downto 0);
+	  PCout: out std_logic_vector(ADDR_WIDTH-1 downto 0)
 );
 end entity;
 
 architecture arch_name of main is
   signal saidaPC, saidaSomaUm : std_logic_vector(ADDR_WIDTH-1 downto 0);
-  signal saidaULA : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   -- signal flagZero : std_logic; -- Ocorre se EntradaUlaA == EntradaUlaB 
   signal instrucaoRom : std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -80,7 +77,8 @@ begin
               Endereco => enderecoRam,
               Dado_in  => saidaRegB,
               Dado_out => saidaRam,
-              we => palavraControle(4)
+              we => palavraControle(4),
+              re => palavraControle(5)
               );
 
   ULA: entity work.ULA generic map (larguraDados => DATA_WIDTH)
@@ -91,7 +89,7 @@ begin
                saida => enderecoRam
                -- flagZero => flagZero
              ); 
-  ULAout <= saidaULA;
+  ULAout <= enderecoRam;
   PCout <= saidaPC;
   
 end architecture;

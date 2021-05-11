@@ -21,11 +21,11 @@ architecture assincrona OF memoriaRom IS
   FUNCTION initMemory
     RETURN blocoMemoria IS VARIABLE tmp : blocoMemoria := (OTHERS => (OTHERS => '0'));
   BEGIN
-     
-    tmp(0) := x"02324022"; -- sub $t0, $s1, $s2  s1 = 2FD s2 = FD 
-	 tmp(1) := x"01004020"; -- add $t0, $t0, $0
-    tmp(2) := x"02324020"; -- add $t0, $s1, $s2
-	 tmp(3) := x"01004020"; -- add $t0, $t0, $0
+    -- op|rs|rt|endereco
+    -- lw  $rt,  imediato($rs);
+    -- R[rt] = M[R[rs]+extSinal(imediato)]
+    tmp(0) := x"8FA80048"; -- lw  $t0,  0x48($sp)  bin: 10001111101010000000000001001000
+	  tmp(1) := x"AFA90004"; -- sw  $t1,  4($sp)     bin: 10101111101010010000000000000100
     RETURN tmp;
   END initMemory;
 
