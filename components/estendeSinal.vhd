@@ -20,6 +20,7 @@ architecture comportamento of estendeSinal is
 begin
     process (estendeSinal_IN) is
     begin
+            -- Substitui todos os bits estendidos pelo valor do 1o bit do sinal de entrada
             if (estendeSinal_IN(larguraDadoEntrada-1) = '1') then
                 estendeSinal_OUT <= (larguraDadoSaida-1 downto larguraDadoEntrada => '1') & estendeSinal_IN;
             else
