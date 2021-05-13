@@ -38,6 +38,9 @@ architecture arch_name of main is
   alias imediatoRd : std_logic_vector(REG_WIDTH-1 downto 0) is instrucaoRom(15 downto 11);
   alias imediato   : std_logic_vector(15 downto 0) is instrucaoRom(15 downto 0);
 
+  -- Usado no pc_imediato
+  alias imediatoShift   : std_logic_vector(25 downto 0) is instrucaoRom(25 downto 0);
+
   -- Saida estende sinal
   signal imediatoEstendido   : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal enderecoRam   : std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -56,15 +59,16 @@ architecture arch_name of main is
 
   signal saidaProxPC : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal entradaMuxProxPC: std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal ime_parcial = std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaProxPcBeq = std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaSomaImedPC = std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaUlaMem = std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaMuxRtImed = std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaMuxRtRd = std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaProxPcBeq : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaSomaImedPC : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaUlaMem : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaMuxRtImed : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaMuxRtRd : std_logic_vector(REG_WIDTH-1 downto 0);
 
 
   signal selProxPcBeq : std_logic;
+   -- MUDAR para chave dps de falar com o Paulo
+  signal habLeitura : std_logic;
 
   -- UCs
   alias selMuxPc_4_BeqJump : std_logic is SW(0);
@@ -74,7 +78,7 @@ architecture arch_name of main is
   alias selOpUla: std_logic_vector(2 downto 0) is SW(6 downto 4);
   alias selMuxUlaMem: std_logic is SW(7);
   alias beqUC: std_logic is SW(8);
-  alias habLeitura, habEscrita: std_logic is SW(9);
+  alias habEscrita: std_logic is SW(9);
 
 begin
 
@@ -92,25 +96,25 @@ begin
 
   LED <= SW;
 
-  muxProxPC: entity work.mux2x1 port map (larguraDados => DATA_WIDTH)
+  muxProxPC: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map(entradaA_MUX => saidaProxPcBeq, entradaB_MUX => entradaMuxProxPC, seletor_MUX => selMuxPc_4_BeqJump, saida_MUX => saidaProxPC);
 
-  muxRtImediato: entity work.mux2x1 port map (larguraDados => DATA_WIDTH)
-    port map(entradaA_MUX => saidaRegB, entradaB_MUX => imediatoEstendido, seletor_MUX => , saida_MUX => saidaMuxRtImed);
+  muxRtImediato: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
+    port map(entradaA_MUX => saidaRegB, entradaB_MUX => imediatoEstendido, seletor_MUX => selMuxRtImed, saida_MUX => saidaMuxRtImed);
 
-  muxRtRd: entity work.mux2x1 port map (larguraDados => DATA_WIDTH)
+  muxRtRd: entity work.mux2x1 generic map (larguraDados => 5)
     port map(entradaA_MUX => imediatoRt, entradaB_MUX => imediatoRd, seletor_MUX => selMuxRtRd, saida_MUX => saidaMuxRtRd);
 
   PcImediato: entity work.joinPcImediato
-    port map (ime => ime_parcial, PC => saidaSomaCte, outp => entradaMuxProxPC);
+    port map (imediato => imediatoShift, PC => saidaSomaCte(31 downto 28), saida => entradaMuxProxPC);
 
   SomaImedPC: entity work.somaImedPC
-    port map (PC => saidaSomaCte, imExtShift => imediatoEstendido(29 downto 0) & 00, saida => saidaSomaImedPC); -- MUDAR
+    port map (PC => saidaSomaCte, imExtShift => imediatoEstendido(29 downto 0) & "00", saida => saidaSomaImedPC); -- MUDAR
 
-  muxSomaCteBeq: entity work.mux2x1 port map (larguraDados => DATA_WIDTH)
+  muxSomaCteBeq: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map(entradaA_MUX => saidaSomaCte, entradaB_MUX => saidaSomaImedPC, seletor_MUX => selProxPcBeq, saida_MUX => saidaProxPcBeq);
 
-  muxUlaMem: entity work.mux2x1 port map (larguraDados => DATA_WIDTH)
+  muxUlaMem: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map(entradaA_MUX => enderecoRam, entradaB_MUX => saidaRam, seletor_MUX => selMuxUlaMem, saida_MUX => saidaUlaMem);
 
 
@@ -201,7 +205,7 @@ begin
               Dado_in  => saidaRegB,
               Dado_out => saidaRam,
               we => habEscrita,
-              re => habLeitura
+              re => habEscrita
               );
 
   ULA: entity work.ULA generic map (larguraDados => DATA_WIDTH)
@@ -213,5 +217,5 @@ begin
                flagZero => flagZero
              ); 
   
-    selProxPcBeq <= 1 when (flagZero = '1' and beqUC = '1') else '0';
+    selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
 end architecture;
