@@ -130,8 +130,8 @@ begin
               saidaB => saidaRegB
             );
 
-    MuxSaida7Seg: entity work.mux3x1 
-      port map(entradaA_MUX => enderecoRam, entradaB_MUX => saidaRegB, entradaC_MUX => saidaRam, seletor_MUX => SW(7 downto 6), saida_MUX => displayOut);
+    MuxSaida7Seg: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
+      port map(entradaA_MUX => saidaPC, entradaB_MUX => saidaProxPC, seletor_MUX => SW(7), saida_MUX => displayOut);
 
     DISPLAY0 : entity work.conversorHex7Seg
       port map
