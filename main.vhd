@@ -15,11 +15,12 @@ entity main is
   port
   (
     Clk      : in std_logic;
-    SW       : in  std_logic_vector(9 downto 0);
-    BUT      : in  std_logic_vector(3 downto 0);
-    -- Monitora PC
-    LED      : out  std_logic_vector(9 downto 0);
-    HEX0, HEX1, HEX2, HEX3, HEX4, HEX5      : out std_logic_vector(6 downto 0)
+    AuxReset : in std_logic;
+    SW       : in  std_logic_vector(10 downto 0);
+    -- Out
+    PC_IN   : out std_logic_vector(DATA_WIDTH-1 downto 0);
+    PC_OUT   : out std_logic_vector(DATA_WIDTH-1 downto 0);
+    LED      : out  std_logic_vector(10 downto 0) -- Valores dos Pontos de Controle
 );
 end entity;
 
@@ -49,10 +50,7 @@ architecture arch_name of main is
   signal palavraControle : std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
 
   -- BUT
-  signal auxReset, auxClk : std_logic;
-
-  -- Display Output (from Mux)
-  signal displayOut : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal auxClk : std_logic;
 
   -- Signal flagzero
   signal flagZero : std_logic;
@@ -67,8 +65,6 @@ architecture arch_name of main is
 
 
   signal selProxPcBeq : std_logic;
-   -- MUDAR para chave dps de falar com o Paulo
-  signal habLeitura : std_logic;
 
   -- UCs
   alias selMuxPc_4_BeqJump : std_logic is SW(0);
@@ -79,14 +75,12 @@ architecture arch_name of main is
   alias selMuxUlaMem: std_logic is SW(7);
   alias beqUC: std_logic is SW(8);
   alias habEscrita: std_logic is SW(9);
+  alias habLeitura: std_logic is SW(10);
 
 begin
 
   PC: entity work.registradorGenerico generic map (larguraDados => ADDR_WIDTH)
-    port map (DIN => saidaProxPC, DOUT => saidaPC, ENABLE => '1', CLK => auxClk, RST => auxReset);
-
-  detectorSub0: work.edgeDetector(bordaSubida) port map (clk => Clk, entrada => (not BUT(0)), saida => auxReset);
-  detectorSub1: work.edgeDetector(bordaSubida) port map (clk => Clk, entrada => (not BUT(1)), saida => auxClk);
+    port map (DIN => saidaProxPC, DOUT => saidaPC, ENABLE => '1', CLK => Clk, RST => AuxReset);
 
   SomaConstante: entity work.somaConstante generic map (larguraDados => ADDR_WIDTH, constante => CONSTANTE_PC)
     port map(entrada => saidaPC, saida => saidaSomaCte);
@@ -95,9 +89,6 @@ begin
     port map(Endereco => SaidaPC, Dado => instrucaoRom);
 
   LED <= SW;
-
-  muxProxPC: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
-    port map(entradaA_MUX => saidaProxPcBeq, entradaB_MUX => entradaMuxProxPC, seletor_MUX => selMuxPc_4_BeqJump, saida_MUX => saidaProxPC);
 
   muxRtImediato: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map(entradaA_MUX => saidaRegB, entradaB_MUX => imediatoEstendido, seletor_MUX => selMuxRtImed, saida_MUX => saidaMuxRtImed);
@@ -130,70 +121,6 @@ begin
               saidaB => saidaRegB
             );
 
-    MuxSaida7Seg: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
-      port map(entradaA_MUX => saidaPC, entradaB_MUX => saidaProxPC, seletor_MUX => SW(7), saida_MUX => displayOut);
-
-    DISPLAY0 : entity work.conversorHex7Seg
-      port map
-      (
-        dadoHex   => displayOut(3 downto 0),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX0
-      );
-
-   
-    DISPLAY1 : entity work.conversorHex7Seg
-      port map
-      (
-        dadoHex   => displayOut(7 downto 4),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX1
-      );
-   
-    DISPLAY2 : ENTITY work.conversorHex7Seg
-      PORT MAP
-      (
-        dadoHex   => displayOut(11 downto 8),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX2
-      );
-    
-    DISPLAY3 : entity work.conversorHex7Seg
-      port map
-      (
-        dadoHex   => displayOut(15 downto 12),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX3
-      );
-    
-    DISPLAY4 : entity work.conversorHex7Seg
-      port map
-      (
-        dadoHex   => displayOut(19 downto 16),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX4
-      );
-    
-    DISPLAY5 : entity work.conversorHex7Seg
-      port map
-      (
-        dadoHex   => displayOut(23 downto 20),
-        apaga     => '0',
-        negativo  => '0',
-        overFlow  => '0',
-        saida7seg => HEX5
-      );
-
 
     EstendeSinal: entity work.estendeSinal generic map (larguraDadoEntrada => 16 , larguraDadoSaida => DATA_WIDTH)
       port map ( estendeSinal_IN => imediato, estendeSinal_OUT => imediatoEstendido);
@@ -205,7 +132,7 @@ begin
               Dado_in  => saidaRegB,
               Dado_out => saidaRam,
               we => habEscrita,
-              re => habEscrita
+              re => habLeitura
               );
 
   ULA: entity work.ULA generic map (larguraDados => DATA_WIDTH)
@@ -218,4 +145,7 @@ begin
              ); 
   
     selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
+
+    PC_IN <= saidaProxPC;
+    PC_OUT <= saidaPC;
 end architecture;
