@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity unidadeControle is
   generic (
             OPCODE_WIDTH: natural := 6;
-            PALAVRA_CONTROLE_WIDTH: natural := 6
+            PALAVRA_CONTROLE_WIDTH: natural := 10
           );
   port (
          -- Input ports
@@ -25,10 +25,10 @@ architecture arch_name of unidadeControle is
   alias habEscritaReg : std_logic is pontosControle(2);
   alias mux_rt_imed   : std_logic is pontosControle(3);
   alias mux_ula_mem   : std_logic is pontosControle(4);
-  alias beqUC           : std_logic is pontosControle(5);
-  alias habEscritRam  : std_logic is pontosControle(6);
-  alias habLeituraRam : std_logic is pontosControle(7);
-  alias ulaOP         : std_logic_vector(2 downto 0) is pontosControle(10 downto 8);
+  alias beqUC         : std_logic is pontosControle(5);
+  alias habLeituraRam : std_logic is pontosControle(6);
+  alias habEscritaRam  : std_logic is pontosControle(7);
+  alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8);
 
   -- INSTRUCTIONS
   constant instrucaoR : std_logic_vector := "000000"; -- Funct define operação
@@ -41,7 +41,7 @@ architecture arch_name of unidadeControle is
   begin
     mux_PcBeq_J <= '1' when opCode = instrucaoJ else '0';
 
-    mux_rt_imed <= '1' when opCode = instrucaoR;
+    mux_rt_rd <= '1' when opCode = instrucaoR;
 
     habEscritaReg <= '1' when (opCode = instrucaoR or opCode = lw) else '0';
 
@@ -53,7 +53,7 @@ architecture arch_name of unidadeControle is
 
     habLeituraRam <= '1' when opCode = lw else '0';
 
-    habEscritRam <= '1' when opCode = sw else '0';
+    habEscritaRam <= '1' when opCode = sw else '0';
 
     ulaOP <= "10" when opCode = instrucaoR else
              "01" when opCode = beq else
