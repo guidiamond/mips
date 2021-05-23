@@ -11,7 +11,7 @@ entity fluxoDados is
             FUNCT_WIDTH: NATURAL := 6;
             REG_WIDTH: NATURAL := 5;
             LED_WIDTH: NATURAL := 8; -- 2⁸
-            ULA_CTRL_WIDTH: natural := 3
+            ULA_CTRL_WIDTH: natural := 4
           );
 
   port (

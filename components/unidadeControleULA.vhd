@@ -6,7 +6,7 @@ entity unidadeControleULA is
   generic (
             FUNCT_WIDTH: natural := 6;
             ULA_OP_WIDTH: natural := 2;
-            ULA_CTRL_WIDTH: natural := 3
+            ULA_CTRL_WIDTH: natural := 4
           );
   port (
          -- Input ports
@@ -33,14 +33,14 @@ architecture arch_name of unidadeControleULA is
 
   begin
 
-    ulaCtrl <= "010" when (ulaOP=r_inst and funct = add_funct) else -- add
-               "110" when (ulaOP=r_inst and funct = sub_funct) else -- sub
-               "000" when (ulaOP=r_inst and funct = and_funct) else -- and
-               "001" when (ulaOP=r_inst and funct = or_funct) else -- or
-               "111" when (ulaOP=r_inst and funct = slt_funct) else -- slt
-               "010" when (ulaOP=add_inst) else -- lw, sw
-               "110" when (ulaOP=sub_inst) else -- beq
-               "000";
+    ulaCtrl <= "0010" when (ulaOP=r_inst and funct = add_funct) else -- add
+               "0110" when (ulaOP=r_inst and funct = sub_funct) else -- sub
+               "0000" when (ulaOP=r_inst and funct = and_funct) else -- and
+               "0001" when (ulaOP=r_inst and funct = or_funct) else -- or
+               "0111" when (ulaOP=r_inst and funct = slt_funct) else -- slt
+               "0010" when (ulaOP=add_inst) else -- lw, sw
+               "0110" when (ulaOP=sub_inst) else -- beq
+               "0000";
 
 end architecture;
 
