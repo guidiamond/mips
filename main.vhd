@@ -13,11 +13,14 @@ entity main is
           );
 
   port (
-    Clk      : in std_logic
+    Clk      : in std_logic;
+    saida_pc : out std_logic_vector(DATA_WIDTH-1 downto 0);
+    saida_ula :out std_logic_vector(DATA_WIDTH-1 downto 0)
 );
 end entity;
 
 architecture arch_name of main is
+
 begin
-  CPU: entity work.cpu port map (clk => Clk);
+  CPU: entity work.cpu port map (clk => Clk, saida_pc => saida_pc, saida_ula => saida_ula);
 end architecture;

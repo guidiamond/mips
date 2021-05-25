@@ -17,7 +17,9 @@ entity fluxoDados is
   port (
            Clk      : in std_logic;
            pontosControle : in std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
-           opCode : out std_logic_vector(OPCODE_WIDTH-1 downto 0)
+           opCode : out std_logic_vector(OPCODE_WIDTH-1 downto 0);
+           saida_pc :  out std_logic_vector(DATA_WIDTH-1 downto 0);
+           saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0)
 );
 end entity;
 
@@ -77,6 +79,9 @@ begin
 
   PC: entity work.registradorGenerico generic map (larguraDados => DATA_WIDTH)
     port map ( DIN => proxInstrucao, DOUT => saidaPC, ENABLE => '1', CLK => Clk, RST => '0' );
+
+  saida_pc <= saidaPC;
+  saida_ula <= enderecoRam;
 
   Mux_PcBeq_J: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map( entradaA_MUX => pc_or_beq, entradaB_MUX => jump, seletor_MUX => sel_PcBeq_J, saida_MUX => proxInstrucao );

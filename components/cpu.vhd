@@ -10,7 +10,9 @@ entity cpu is
           );
 
   port (
-    Clk      : in std_logic
+    Clk      : in std_logic;
+    saida_pc  : out std_logic_vector(DATA_WIDTH-1 downto 0);
+    saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0)
 );
 end entity;
 
@@ -18,6 +20,6 @@ architecture arch_name of cpu is
   signal palavraControle : std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
   signal opCode : std_logic_vector(OPCODE_WIDTH-1 downto 0);
 begin
-    FD: entity work.fluxoDados port map ( clk => Clk, pontosControle => palavraControle, opCode => opCode );
+    FD: entity work.fluxoDados port map ( clk => Clk, pontosControle => palavraControle, opCode => opCode, saida_pc => saida_pc, saida_ula => saida_ula );
     UC: entity work.unidadeControle port map ( clk => Clk, opCode => opCode, palavraControle => palavraControle );
 end architecture;
