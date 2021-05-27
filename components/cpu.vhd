@@ -5,27 +5,33 @@ use ieee.numeric_std.all;
 entity cpu is
   generic (
             DATA_WIDTH : NATURAL := 32;
-            PALAVRA_CONTROLE_WIDTH: NATURAL := 10;
+            PALAVRA_CONTROLE_WIDTH: NATURAL := 10; -- Num. dos pontos de controle
             OPCODE_WIDTH: NATURAL := 6
           );
 
   port (
-    Clk      : in std_logic;
-    saida_pc  : out std_logic_vector(DATA_WIDTH-1 downto 0);
-    saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0);
-  -- Debug
-    flag_zero_debug : out std_logic;
-    Ula_ctl_debug : out std_logic_vector(3 downto 0);
-    ula_op_debug : out std_logic_vector(1 downto 0); 
-    entradaA_debug: out std_logic_vector(DATA_WIDTH-1 downto 0);
-    entradaB_debug: out std_logic_vector(DATA_WIDTH-1 downto 0)
+         Clk       : in std_logic;
+         saida_pc  : out std_logic_vector(DATA_WIDTH-1 downto 0); -- Usado para testar funcionamento no waveform
+         saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0) -- Usado para testar funcionamento no waveform
 );
 end entity;
 
 architecture arch_name of cpu is
-  signal palavraControle : std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
-  signal opCode : std_logic_vector(OPCODE_WIDTH-1 downto 0);
+  -- Signals definidos aqui para poder ser usado tanto no FD quanto na UC.
+  signal palavraControle : std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0); -- Vem da UC [saida do UC / entrada do FD]
+  signal opCode : std_logic_vector(OPCODE_WIDTH-1 downto 0); -- Vem do FD ( Rom ) [entrada do UC / saida do FD]
+
 begin
-    FD: entity work.fluxoDados port map ( clk => Clk, pontosControle => palavraControle, opCode => opCode, saida_pc => saida_pc, saida_ula => saida_ula, flag_zero_debug => flag_zero_debug, Ula_ctl_debug => Ula_ctl_debug, entradaA_debug => entradaA_debug, entradaB_debug => entradaB_debug, ula_op_debug => ula_op_debug );
-    UC: entity work.unidadeControle port map ( clk => Clk, opCode => opCode, palavraControle => palavraControle );
+  FD: entity work.fluxoDados port map (
+                                        clk => Clk, pontosControle => palavraControle,
+                                        opCode => opCode,
+                                        saida_pc => saida_pc,
+                                        saida_ula => saida_ula 
+                                      );
+
+  UC: entity work.unidadeControle port map (
+                                             clk => Clk,
+                                             opCode => opCode,
+                                             palavraControle => palavraControle 
+                                           );
 end architecture;

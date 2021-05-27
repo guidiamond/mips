@@ -4,28 +4,23 @@ use ieee.numeric_std.all;
 
 entity fluxoDados is
   generic (
-            DATA_WIDTH : NATURAL := 32;
-            CONSTANTE_PC: NATURAL := 4;
-            PALAVRA_CONTROLE_WIDTH: NATURAL := 10;
-            OPCODE_WIDTH: NATURAL := 6;
-            FUNCT_WIDTH: NATURAL := 6;
-            REG_WIDTH: NATURAL := 5;
-            LED_WIDTH: NATURAL := 8; -- 2⁸
-            ULA_CTRL_WIDTH: natural := 4
+            DATA_WIDTH              : NATURAL := 32;
+            PALAVRA_CONTROLE_WIDTH  : NATURAL := 10;
+            OPCODE_WIDTH            : NATURAL := 6;
+            FUNCT_WIDTH             : NATURAL := 6;
+            REG_WIDTH               : NATURAL := 5;
+            ULA_CTRL_WIDTH          : NATURAL := 4;
+            CONSTANTE_PC            : NATURAL := 4
           );
 
   port (
-           Clk      : in std_logic;
-           pontosControle : in std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
-           opCode : out std_logic_vector(OPCODE_WIDTH-1 downto 0);
-           saida_pc :  out std_logic_vector(DATA_WIDTH-1 downto 0);
-           saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0);
-           -- Debug
-           flag_zero_debug : out std_logic;
-           Ula_ctl_debug  : out std_logic_vector(3 downto 0);
-           ula_op_debug : out std_logic_vector(1 downto 0); 
-           entradaA_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
-           entradaB_debug : out std_logic_vector(DATA_WIDTH-1 downto 0)
+           -- Inputs
+           Clk            : in std_logic;
+           pontosControle : in std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0); -- gerado da UC para realizar as instruções
+           -- Outputs
+           opCode         : out std_logic_vector(OPCODE_WIDTH-1 downto 0); -- usado na UC para gerar os pontosControle
+           saida_pc       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- Usados para testes com o waveform
+           saida_ula      : out std_logic_vector(DATA_WIDTH-1 downto 0)  -- Usados para testes com o waveform
 );
 end entity;
 
@@ -38,10 +33,10 @@ architecture arch_name of fluxoDados is
   signal saidaRegB : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   -- Instrucao alias
-  alias imedOpCode     : std_logic_vector(OPCODE_WIDTH-1 downto 0) is instRom(DATA_WIDTH-1 downto 26);
-  alias imedRs : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(25 downto 21);
-  alias imedRt : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(20 downto 16);
-  alias imedRd : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(15 downto 11);
+  alias imedOpCode : std_logic_vector(OPCODE_WIDTH-1 downto 0) is instRom(DATA_WIDTH-1 downto 26);
+  alias imedRs     : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(25 downto 21);
+  alias imedRt     : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(20 downto 16);
+  alias imedRd     : std_logic_vector(REG_WIDTH-1 downto 0) is instRom(15 downto 11);
   alias imediato   : std_logic_vector(15 downto 0) is instRom(15 downto 0);
   alias funct      : std_logic_vector(FUNCT_WIDTH-1 downto 0) is instRom(FUNCT_WIDTH-1 downto 0);
 
@@ -49,19 +44,19 @@ architecture arch_name of fluxoDados is
   alias imediatoShift   : std_logic_vector(25 downto 0) is instRom(25 downto 0);
 
   -- Saida estende sinal
-  signal imedExt   : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal enderecoRam   : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaRam   : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal imedExt      : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal enderecoRam  : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaRam     : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   -- Signal flagzero
   signal flagZero : std_logic;
 
-  signal proxInstrucao : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal pc_or_beq : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal proxInstrucao   : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal pc_or_beq       : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal saidaSomaImedPC : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaUlaMem : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaMuxRtImed : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal rt_or_rd : std_logic_vector(REG_WIDTH-1 downto 0);
+  signal saidaUlaMem     : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaMuxRtImed  : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal rt_or_rd        : std_logic_vector(REG_WIDTH-1 downto 0);
 
 
   signal selProxPcBeq : std_logic;
@@ -74,11 +69,11 @@ architecture arch_name of fluxoDados is
   alias sel_ula_mem   : std_logic is pontosControle(4);
   alias beqUC         : std_logic is pontosControle(5);
   alias habLeituraRam : std_logic is pontosControle(6);
-  alias habEscritaRam  : std_logic is pontosControle(7);
+  alias habEscritaRam : std_logic is pontosControle(7);
   alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8);
 
   signal ulaCtrl : std_logic_vector(ULA_CTRL_WIDTH-1 downto 0);
-  signal jump : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal jump    : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 
 begin
@@ -86,8 +81,6 @@ begin
   PC: entity work.registradorGenerico generic map (larguraDados => DATA_WIDTH)
     port map ( DIN => proxInstrucao, DOUT => saidaPC, ENABLE => '1', CLK => Clk, RST => '0' );
 
-  saida_pc <= saidaPC;
-  saida_ula <= enderecoRam;
 
   Mux_PcBeq_J: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map( entradaA_MUX => pc_or_beq, entradaB_MUX => jump, seletor_MUX => sel_PcBeq_J, saida_MUX => proxInstrucao );
@@ -154,10 +147,9 @@ begin
   
     selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
     opCode <= imedOpCode;
-    -- Debug
-    flag_zero_debug <= flagZero;
-    Ula_ctl_debug  <= ulaCtrl;
-    entradaA_debug  <= saidaRegA;
-    entradaB_debug <= saidaMuxRtImed;
-    ula_op_debug <= ulaOP;
+
+    -- Usado para teste no waveform
+    saida_pc <= saidaPC;
+    saida_ula <= enderecoRam;
+
 end architecture;

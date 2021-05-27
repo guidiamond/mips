@@ -13,20 +13,15 @@ entity main is
           );
 
   port (
-    Clk      : in std_logic;
-    saida_pc : out std_logic_vector(DATA_WIDTH-1 downto 0);
-    saida_ula :out std_logic_vector(DATA_WIDTH-1 downto 0);
-  -- Debug
-    flag_zero_debug : out std_logic;
-    Ula_ctl_debug : out std_logic_vector(3 downto 0);
-    ula_op_debug : out std_logic_vector(1 downto 0); 
-    entradaA_debug: out std_logic_vector(DATA_WIDTH-1 downto 0);
-    entradaB_debug: out std_logic_vector(DATA_WIDTH-1 downto 0)
+         Clk       : in std_logic;
+         saida_pc  : out std_logic_vector(DATA_WIDTH-1 downto 0);
+         saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0)
 );
 end entity;
 
 architecture arch_name of main is
 
 begin
-  CPU: entity work.cpu port map (clk => Clk, saida_pc => saida_pc, saida_ula => saida_ula, flag_zero_debug => flag_zero_debug, Ula_ctl_debug => Ula_ctl_debug, entradaA_debug => entradaA_debug, entradaB_debug => entradaB_debug, ula_op_debug => ula_op_debug);
+  -- Cpu criada como componente separado para facilitar/dividir implementação com periféricos externos (hex, botões, etc)
+  CPU: entity work.cpu port map ( clk => Clk, saida_pc => saida_pc, saida_ula => saida_ula );
 end architecture;
