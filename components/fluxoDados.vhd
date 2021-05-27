@@ -19,7 +19,13 @@ entity fluxoDados is
            pontosControle : in std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0);
            opCode : out std_logic_vector(OPCODE_WIDTH-1 downto 0);
            saida_pc :  out std_logic_vector(DATA_WIDTH-1 downto 0);
-           saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0)
+           saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0);
+           -- Debug
+           flag_zero_debug : out std_logic;
+           Ula_ctl_debug  : out std_logic_vector(3 downto 0);
+           ula_op_debug : out std_logic_vector(1 downto 0); 
+           entradaA_debug : out std_logic_vector(DATA_WIDTH-1 downto 0);
+           entradaB_debug : out std_logic_vector(DATA_WIDTH-1 downto 0)
 );
 end entity;
 
@@ -148,5 +154,10 @@ begin
   
     selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
     opCode <= imedOpCode;
-
+    -- Debug
+    flag_zero_debug <= flagZero;
+    Ula_ctl_debug  <= ulaCtrl;
+    entradaA_debug  <= saidaRegA;
+    entradaB_debug <= saidaMuxRtImed;
+    ula_op_debug <= ulaOP;
 end architecture;

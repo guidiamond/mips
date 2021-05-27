@@ -22,7 +22,7 @@ architecture arch_name of unidadeControleULA is
   -- ULA OP
   constant r_inst   : std_logic_vector := "10"; -- Funct define operação
   constant add_inst : std_logic_vector := "00";
-  constant sub_inst : std_logic_vector := "10";
+  constant sub_inst : std_logic_vector := "01";
 
   -- Funct (Instruções tipo R)
   constant add_funct : std_logic_vector := "100000"; --20
@@ -43,4 +43,3 @@ architecture arch_name of unidadeControleULA is
                "0000";
 
 end architecture;
-
