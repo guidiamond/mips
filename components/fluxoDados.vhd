@@ -29,8 +29,7 @@ architecture arch_name of fluxoDados is
 
   signal instRom : std_logic_vector(DATA_WIDTH-1 downto 0);
 
-  signal saidaRegA : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal saidaRegB : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaRegA, saidaRegB : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   -- Instrucao alias
   alias imedOpCode : std_logic_vector(OPCODE_WIDTH-1 downto 0) is instRom(DATA_WIDTH-1 downto 26);
@@ -45,7 +44,7 @@ architecture arch_name of fluxoDados is
 
   -- Saida estende sinal
   signal imedExt      : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal enderecoRam  : std_logic_vector(DATA_WIDTH-1 downto 0);
+  signal saidaUla  : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal saidaRam     : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   -- Signal flagzero
@@ -58,7 +57,6 @@ architecture arch_name of fluxoDados is
   signal saidaMuxRtImed  : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal rt_or_rd        : std_logic_vector(REG_WIDTH-1 downto 0);
 
-
   signal selProxPcBeq : std_logic;
 
   -- UCs
@@ -70,17 +68,20 @@ architecture arch_name of fluxoDados is
   alias beqUC         : std_logic is pontosControle(5);
   alias habLeituraRam : std_logic is pontosControle(6);
   alias habEscritaRam : std_logic is pontosControle(7);
-  alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8);
 
+  -- [00: lw/sw, 01: Beq, 10: inst R]
+  alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8); 
+
+  -- [b3: inverte A, b2: inverte B, b1,b0: mux]
   signal ulaCtrl : std_logic_vector(ULA_CTRL_WIDTH-1 downto 0);
-  signal jump    : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+  signal jump    : std_logic_vector(DATA_WIDTH-1 downto 0); -- Contem a posição para o PC realizar o pulo para instruções J
 
 
 begin
 
   PC: entity work.registradorGenerico generic map (larguraDados => DATA_WIDTH)
     port map ( DIN => proxInstrucao, DOUT => saidaPC, ENABLE => '1', CLK => Clk, RST => '0' );
-
 
   Mux_PcBeq_J: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map( entradaA_MUX => pc_or_beq, entradaB_MUX => jump, seletor_MUX => sel_PcBeq_J, saida_MUX => proxInstrucao );
@@ -119,37 +120,38 @@ begin
     port map(entradaA_MUX => saidaSomaCte, entradaB_MUX => saidaSomaImedPC, seletor_MUX => selProxPcBeq, saida_MUX => pc_or_beq);
 
   MuxUlaMem: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
-    port map(entradaA_MUX => enderecoRam, entradaB_MUX => saidaRam, seletor_MUX => sel_ula_mem, saida_MUX => saidaUlaMem);
+    port map(entradaA_MUX => saidaUla, entradaB_MUX => saidaRam, seletor_MUX => sel_ula_mem, saida_MUX => saidaUlaMem);
 
   EstendeSinal: entity work.estendeSinal generic map (larguraDadoEntrada => 16 , larguraDadoSaida => DATA_WIDTH)
     port map ( estendeSinal_IN => imediato, estendeSinal_OUT => imedExt );
 
-    MemoriaRam: entity work.memoriaRam
+  MemoriaRam: entity work.memoriaRam
       port map (
               clk      => Clk,
-              Endereco => enderecoRam,
+              Endereco => saidaUla,
               Dado_in  => saidaRegB,
               Dado_out => saidaRam,
-              we => habEscritaRam,
-              re => habLeituraRam
+              we       => habEscritaRam,
+              re       => habLeituraRam
             );
 
-    UC_ULA: entity work.unidadeControleULA port map ( clk => Clk, funct => funct, ulaOP => ulaOP, ulaCtrl => ulaCtrl );
+  UC_ULA: entity work.unidadeControleULA port map ( clk => Clk, funct => funct, ulaOP => ulaOP, ulaCtrl => ulaCtrl );
 
-    ULA: entity work.ULA generic map (larguraDados => DATA_WIDTH)
+  ULA: entity work.ULA generic map (larguraDados => DATA_WIDTH)
       port map (
                entradaA => saidaRegA,
                entradaB => saidaMuxRtImed,
-               seletor  => ulaCtrl, -- vem da UC
-               saida    => enderecoRam,
+               seletor  => ulaCtrl, -- UC
+               saida    => saidaUla,
                flagZero => flagZero
              ); 
   
-    selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
-    opCode <= imedOpCode;
+  selProxPcBeq <= '1' when (flagZero = '1' and beqUC = '1') else '0';
 
-    -- Usado para teste no waveform
-    saida_pc <= saidaPC;
-    saida_ula <= enderecoRam;
+  opCode <= imedOpCode;
+
+  -- Usado para teste no waveform
+  saida_pc  <= saidaPC;
+  saida_ula <= saidaUla;
 
 end architecture;

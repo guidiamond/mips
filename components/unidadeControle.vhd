@@ -4,15 +4,15 @@ use ieee.numeric_std.all;
 
 entity unidadeControle is
   generic (
-            OPCODE_WIDTH: natural := 6;
-            PALAVRA_CONTROLE_WIDTH: natural := 10
+            PALAVRA_CONTROLE_WIDTH : natural := 10;
+            OPCODE_WIDTH           : natural := 6
           );
   port (
          -- Input ports
-         clk  :  in  std_logic;
-         opCode  :  in  std_logic_vector(OPCODE_WIDTH-1 downto 0);
+         clk             :  in  std_logic;
+         opCode          :  in  std_logic_vector(OPCODE_WIDTH-1 downto 0);
          -- Output ports
-         palavraControle  :  out std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0)
+         palavraControle :  out std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0)
        );
 end entity;
 
@@ -27,16 +27,17 @@ architecture arch_name of unidadeControle is
   alias mux_ula_mem   : std_logic is pontosControle(4);
   alias beqUC         : std_logic is pontosControle(5);
   alias habLeituraRam : std_logic is pontosControle(6);
-  alias habEscritaRam  : std_logic is pontosControle(7);
+  alias habEscritaRam : std_logic is pontosControle(7);
   alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8);
 
   -- INSTRUCTIONS
   constant instrucaoR : std_logic_vector := "000000"; -- Funct define operação
   constant instrucaoJ : std_logic_vector := "000010";
-  -- Tipo I
-  constant lw   : std_logic_vector := "100011";
-  constant sw   : std_logic_vector := "101011";
-  constant beq  : std_logic_vector := "000100";
+
+  -- INSTRUCTIONS (Tipo I)
+  constant lw       : std_logic_vector := "100011";
+  constant sw       : std_logic_vector := "101011";
+  constant beqInst  : std_logic_vector := "000100";
 
   begin
     mux_PcBeq_J <= '1' when opCode = instrucaoJ else '0';
@@ -49,14 +50,14 @@ architecture arch_name of unidadeControle is
 
     mux_ula_mem <= '1' when opCode = lw else '0';
 
-    beqUC <= '1' when opCode = beq else '0';
+    beqUC <= '1' when opCode = beqInst else '0';
 
     habLeituraRam <= '1' when opCode = lw else '0';
 
     habEscritaRam <= '1' when opCode = sw else '0';
 
     ulaOP <= "10" when opCode = instrucaoR else
-             "01" when opCode = beq else
+             "01" when opCode = beqInst else
              "00";
 
     -- Assign resultado final para output

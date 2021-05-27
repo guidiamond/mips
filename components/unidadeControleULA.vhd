@@ -5,14 +5,14 @@ use ieee.numeric_std.all;
 entity unidadeControleULA is
   generic (
             FUNCT_WIDTH: natural := 6;
-            ULA_OP_WIDTH: natural := 2;
-            ULA_CTRL_WIDTH: natural := 4
+            ULA_CTRL_WIDTH: natural := 4;
+            ULA_OP_WIDTH: natural := 2
           );
   port (
          -- Input ports
-         clk  :  in  std_logic;
-         funct : in std_logic_vector(FUNCT_WIDTH-1 downto 0);
-         ulaOP : in std_logic_vector(ULA_OP_WIDTH-1 downto 0);
+         funct    : in std_logic_vector(FUNCT_WIDTH-1 downto 0);
+         ulaOP    : in std_logic_vector(ULA_OP_WIDTH-1 downto 0);
+         clk      :  in  std_logic;
          -- Output ports
          ulaCtrl  :  out std_logic_vector(ULA_CTRL_WIDTH-1 downto 0)
        );
