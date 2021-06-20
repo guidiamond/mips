@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity fluxoDados is
   generic (
             DATA_WIDTH              : NATURAL := 32;
-            PALAVRA_CONTROLE_WIDTH  : NATURAL := 11;
+            PALAVRA_CONTROLE_WIDTH  : NATURAL := 13;
             OPCODE_WIDTH            : NATURAL := 6;
             FUNCT_WIDTH             : NATURAL := 6;
             REG_WIDTH               : NATURAL := 5;
@@ -72,6 +72,8 @@ architecture arch_name of fluxoDados is
   -- [00: lw/sw, 01: Beq, 10: inst R]
   alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(10 downto 9); 
 
+  alias extSig        : std_logic_vector(1 downto 0) is pontosControle(12 downto 11); 
+
   -- [b3: inverte A, b2: inverte B, b1,b0: mux]
   signal ulaCtrl : std_logic_vector(ULA_CTRL_WIDTH-1 downto 0);
 
@@ -129,7 +131,7 @@ begin
            );
 
   EstendeSinal: entity work.estendeSinal generic map (larguraDadoEntrada => 16 , larguraDadoSaida => DATA_WIDTH)
-    port map ( estendeSinal_IN => imediato, estendeSinal_OUT => imedExt );
+    port map ( estendeSinal_IN => imediato, seletor => extSig, estendeSinal_OUT => imedExt );
 
   MemoriaRam: entity work.memoriaRam
       port map (

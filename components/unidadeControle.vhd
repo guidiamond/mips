@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity unidadeControle is
   generic (
-            PALAVRA_CONTROLE_WIDTH : natural := 11;
+            PALAVRA_CONTROLE_WIDTH : natural := 13;
             OPCODE_WIDTH           : natural := 6
           );
   port (
@@ -29,6 +29,7 @@ architecture arch_name of unidadeControle is
   alias habLeituraRam : std_logic is pontosControle(7);
   alias habEscritaRam : std_logic is pontosControle(8);
   alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(10 downto 9);
+  alias extSig        : std_logic_vector(1 downto 0) is pontosControle(12 downto 11);
 
   -- INSTRUCTIONS
   constant instrucaoR : std_logic_vector := "000000"; -- Funct define operação
@@ -63,6 +64,11 @@ architecture arch_name of unidadeControle is
              "01" when opCode = beqInst else
              "11" when opCode = ori else
              "00";
+
+    extSig <= "01" when opCode = lui else 
+              "10" when opCode = ori else
+              "00";
+
 
     -- Assign resultado final para output
     palavraControle <= pontosControle;
