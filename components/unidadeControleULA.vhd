@@ -30,6 +30,7 @@ architecture arch_name of unidadeControleULA is
   constant and_funct : std_logic_vector := "100100"; --24
   constant or_funct  : std_logic_vector := "100101"; --25
   constant slt_funct : std_logic_vector := "101010"; --2a
+  constant ori_funct : std_logic_vector := "001101"; --d
 
   begin
 

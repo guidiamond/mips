@@ -4,12 +4,7 @@ use ieee.numeric_std.all;
 
 entity main is
   generic (
-            DATA_WIDTH : NATURAL := 32;
-            ADDR_WIDTH : NATURAL := 32;
-            CONSTANTE_PC: NATURAL := 4;
-            PALAVRA_CONTROLE_WIDTH: NATURAL := 6;
-            REG_WIDTH: NATURAL := 5;
-            LED_WIDTH: NATURAL := 8 -- 2⁸
+            DATA_WIDTH : NATURAL := 32
           );
 
   port (

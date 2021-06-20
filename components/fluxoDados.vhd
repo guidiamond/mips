@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity fluxoDados is
   generic (
             DATA_WIDTH              : NATURAL := 32;
-            PALAVRA_CONTROLE_WIDTH  : NATURAL := 10;
+            PALAVRA_CONTROLE_WIDTH  : NATURAL := 13;
             OPCODE_WIDTH            : NATURAL := 6;
             FUNCT_WIDTH             : NATURAL := 6;
             REG_WIDTH               : NATURAL := 5;
@@ -64,10 +64,11 @@ architecture arch_name of fluxoDados is
   alias sel_rt_rd     : std_logic is pontosControle(1);
   alias habEscritaReg : std_logic is pontosControle(2);
   alias sel_rt_imed   : std_logic is pontosControle(3);
-  alias sel_ula_mem   : std_logic is pontosControle(4);
-  alias beqUC         : std_logic is pontosControle(5);
-  alias habLeituraRam : std_logic is pontosControle(6);
-  alias habEscritaRam : std_logic is pontosControle(7);
+  alias sel_ula_mem   : std_logic_vector is pontosControle(5 downto 4);
+  alias beqUC         : std_logic is pontosControle(6);
+  alias habLeituraRam : std_logic is pontosControle(7);
+  alias habEscritaRam : std_logic is pontosControle(8);
+  alias extSigSel     : std_logic_vector is pontosControle(12 downto 11);
 
   -- [00: lw/sw, 01: Beq, 10: inst R]
   alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8); 
@@ -119,11 +120,17 @@ begin
   MuxSomaCteBeq: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
     port map(entradaA_MUX => saidaSomaCte, entradaB_MUX => saidaSomaImedPC, seletor_MUX => selProxPcBeq, saida_MUX => pc_or_beq);
 
-  MuxUlaMem: entity work.mux2x1 generic map (larguraDados => DATA_WIDTH)
-    port map(entradaA_MUX => saidaUla, entradaB_MUX => saidaRam, seletor_MUX => sel_ula_mem, saida_MUX => saidaUlaMem);
+  MuxUlaMemImed: entity work.mux3x1 generic map (larguraDados => DATA_WIDTH)
+    port map(
+             entradaA_MUX => saidaUla,
+             entradaB_MUX => saidaRam,
+             entradaC_MUX => imedExt,
+             seletor_MUX => sel_ula_mem,
+             saida_MUX => saidaUlaMem
+           );
 
   EstendeSinal: entity work.estendeSinal generic map (larguraDadoEntrada => 16 , larguraDadoSaida => DATA_WIDTH)
-    port map ( estendeSinal_IN => imediato, estendeSinal_OUT => imedExt );
+    port map ( estendeSinal_IN => imediato, seletor => extSigSel, estendeSinal_OUT => imedExt );
 
   MemoriaRam: entity work.memoriaRam
       port map (

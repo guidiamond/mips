@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity unidadeControle is
   generic (
-            PALAVRA_CONTROLE_WIDTH : natural := 10;
+            PALAVRA_CONTROLE_WIDTH : natural := 13;
             OPCODE_WIDTH           : natural := 6
           );
   port (
@@ -24,11 +24,12 @@ architecture arch_name of unidadeControle is
   alias mux_rt_rd     : std_logic is pontosControle(1);
   alias habEscritaReg : std_logic is pontosControle(2);
   alias mux_rt_imed   : std_logic is pontosControle(3);
-  alias mux_ula_mem   : std_logic is pontosControle(4);
-  alias beqUC         : std_logic is pontosControle(5);
-  alias habLeituraRam : std_logic is pontosControle(6);
-  alias habEscritaRam : std_logic is pontosControle(7);
-  alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(9 downto 8);
+  alias mux_ula_mem   : std_logic_vector is pontosControle(5 downto 4);
+  alias beqUC         : std_logic is pontosControle(6);
+  alias habLeituraRam : std_logic is pontosControle(7);
+  alias habEscritaRam : std_logic is pontosControle(8);
+  alias ulaOP         : std_logic_vector(1 downto 0) is pontosControle(10 downto 9);
+  alias extSigSel     : std_logic_vector is pontosControle(12 downto 11);
 
   -- INSTRUCTIONS
   constant instrucaoR : std_logic_vector := "000000"; -- Funct define operação
@@ -38,17 +39,21 @@ architecture arch_name of unidadeControle is
   constant lw       : std_logic_vector := "100011";
   constant sw       : std_logic_vector := "101011";
   constant beqInst  : std_logic_vector := "000100";
+  constant lui      : std_logic_vector := "001111";
+  constant ori      : std_logic_vector := "001101";
 
   begin
     mux_PcBeq_J <= '1' when opCode = instrucaoJ else '0';
 
     mux_rt_rd <= '1' when opCode = instrucaoR;
 
-    habEscritaReg <= '1' when (opCode = instrucaoR or opCode = lw) else '0';
+    habEscritaReg <= '1' when (opCode = instrucaoR or opCode = lw or opCode = lui or opCode = ori) else '0';
 
-    mux_rt_imed <= '1' when (opCode = lw or opCode = sw) else '0';
+    mux_rt_imed <= '1' when (opCode = lw or opCode = sw or opCode = lui or opCode = ori) else '0';
 
-    mux_ula_mem <= '1' when opCode = lw else '0';
+    mux_ula_mem <= "01" when (opCode = lw) else
+                   "10" when (opCode = lui or opCode = ori) else
+                   "00";
 
     beqUC <= '1' when opCode = beqInst else '0';
 
@@ -59,6 +64,10 @@ architecture arch_name of unidadeControle is
     ulaOP <= "10" when opCode = instrucaoR else
              "01" when opCode = beqInst else
              "00";
+
+    extSigSel <= "01" when opCode = lui else
+                 "10" when opCode = ori else
+                 "00";
 
     -- Assign resultado final para output
     palavraControle <= pontosControle;
