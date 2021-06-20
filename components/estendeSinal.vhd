@@ -23,9 +23,9 @@ begin
         estendeSinal_OUT <= 
             (larguraDadoSaida-1 downto larguraDadoEntrada => '1') & estendeSinal_IN when seletor = "00" and (estendeSinal_IN(larguraDadoEntrada-1) = '1') else
             (larguraDadoSaida-1 downto larguraDadoEntrada => '0') & estendeSinal_IN when seletor = "00" and (estendeSinal_IN(larguraDadoEntrada-1) = '0') else
-            estendeSinal_IN & x"0000" when seletor = "01" else -- LUI
-            x"0000" & estendeSinal_IN when seletor = "10" else -- ORI
-            x"00000000";
+            estendeSinal_IN & x"0000" when seletor = "01" else
+            x"0000" & estendeSinal_IN when seletor = "10" else
+            x"00000000"; -- ORI
   
 end architecture;
 
