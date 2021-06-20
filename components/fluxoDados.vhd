@@ -18,6 +18,7 @@ entity fluxoDados is
            Clk            : in std_logic;
            pontosControle : in std_logic_vector(PALAVRA_CONTROLE_WIDTH-1 downto 0); -- gerado da UC para realizar as instruções
            -- Outputs
+           debug_reg      : out std_logic_vector(DATA_WIDTH-1 downto 0);
            opCode         : out std_logic_vector(OPCODE_WIDTH-1 downto 0); -- usado na UC para gerar os pontosControle
            saida_pc       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- Usados para testes com o waveform
            saida_ula      : out std_logic_vector(DATA_WIDTH-1 downto 0)  -- Usados para testes com o waveform
@@ -161,5 +162,6 @@ begin
   -- Usado para teste no waveform
   saida_pc  <= saidaPC;
   saida_ula <= saidaUla;
+  debug_reg <=  saidaUlaMem;
 
 end architecture;
