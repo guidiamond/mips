@@ -39,8 +39,8 @@ architecture arch_name of unidadeControle is
   constant lw       : std_logic_vector := "100011";
   constant sw       : std_logic_vector := "101011";
   constant beqInst  : std_logic_vector := "000100";
-  constant ori      : std_logic_vector := "001111";
-  constant lui      : std_logic_vector := "001101";
+  constant lui      : std_logic_vector := "001111";
+  constant ori      : std_logic_vector := "001101";
 
   begin
     mux_PcBeq_J <= '1' when opCode = instrucaoJ else '0';
