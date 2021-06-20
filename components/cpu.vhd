@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity cpu is
   generic (
             DATA_WIDTH : NATURAL := 32;
-            PALAVRA_CONTROLE_WIDTH: NATURAL := 10; -- Num. dos pontos de controle
+            PALAVRA_CONTROLE_WIDTH: NATURAL := 11; -- Num. dos pontos de controle
             OPCODE_WIDTH: NATURAL := 6
           );
 
