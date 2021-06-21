@@ -12,7 +12,6 @@ entity cpu is
   port (
          Clk       : in std_logic;
          saida_pc  : out std_logic_vector(DATA_WIDTH-1 downto 0); -- Usado para testar funcionamento no waveform
-         debug_reg : out std_logic_vector(DATA_WIDTH-1 downto 0);
          saida_ula : out std_logic_vector(DATA_WIDTH-1 downto 0) -- Usado para testar funcionamento no waveform
 );
 end entity;
@@ -26,7 +25,6 @@ begin
   FD: entity work.fluxoDados port map (
                                         clk => Clk, pontosControle => palavraControle,
                                         opCode => opCode,
-                                        debug_reg => debug_reg,
                                         saida_pc => saida_pc,
                                         saida_ula => saida_ula 
                                       );
